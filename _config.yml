@@ -32,8 +32,13 @@ github_username: listenzcc
 
 # Build settings
 theme: minima
+# theme: tale
 plugins:
   - jekyll-feed
+
+# Permalinks
+permalink: /:year-:month-:day/:title
+paginate: 5
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
