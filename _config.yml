@@ -31,10 +31,17 @@ twitter_username: N.A.
 github_username: listenzcc
 
 # Build settings
+markdown: kramdown
+include:
+  - _pages
+
+# Build settings
 theme: minima
 # theme: tale
 plugins:
   - jekyll-feed
+  - jekyll-paginate
+  - jekyll-seo-tag
 
 # Permalinks
 permalink: /:year-:month-:day/:title

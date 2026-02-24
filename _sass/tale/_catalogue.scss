@@ -9,6 +9,9 @@
     &:focus .catalogue-line {
       width: 5rem;
     }
+    .catalogue-line {
+      border-color: #bf616a;
+    }
 
     &:last-child {
       border: 0;

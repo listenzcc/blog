@@ -2,7 +2,7 @@
 layout: post
 title:  "Several Tests"
 date:   2026-02-24 
-categories: jekyll
+tags: jekyll tests
 ---
 Several tests on jekyll formats.
 
