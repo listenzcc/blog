@@ -47,7 +47,7 @@ jobs:
       - name: Convert Gemfile to github-pages gemfile
         run: |
           # Remove the "jekyll" gem and uncomment the "github-pages" gem in the Gemfile
-          sed -i 's/^gem "jekyll".*/# &/' Gemfile
+          # sed -i 's/^gem "jekyll".*/# &/' Gemfile
           sed -i 's/^# gem "github-pages"/gem "github-pages"/' Gemfile
           cat Gemfile
 

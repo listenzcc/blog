@@ -26,7 +26,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   Like svg, canvas, webGL, and so on.
 
 baseurl: "/blog" # the subpath of your site, e.g. /blog
-url: "https://github.com/listenzcc" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://listenzcc.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: N.A.
 github_username: listenzcc
 
