@@ -47,9 +47,14 @@ jobs:
       - name: Convert Gemfile to github-pages gemfile
         run: |
           # Remove the "jekyll" gem and uncomment the "github-pages" gem in the Gemfile
-          # sed -i 's/^gem "jekyll".*/# &/' Gemfile
+          sed -i 's/^gem "jekyll".*/# &/' Gemfile
           sed -i 's/^# gem "github-pages"/gem "github-pages"/' Gemfile
           cat Gemfile
+
+      - name: Install dependencies
+        run: |
+          bundle config set frozen false
+          bundle install
 
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
