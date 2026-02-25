@@ -43,6 +43,10 @@ plugins:
   - jekyll-paginate
   - jekyll-seo-tag
   - jekyll-katex
+  - jekyll-toc
+
+kramdown:
+  toc_levels: "2..3" # Show only h2 and h3 headings
 
 # Permalinks
 permalink: /:year-:month-:day/:title
