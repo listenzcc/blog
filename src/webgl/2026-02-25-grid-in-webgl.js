@@ -2,10 +2,10 @@
 console.log('Using WebGL to draw a grid');
 
 const glsl = Object.freeze({
-    useStandardDerivatives: `
+  useStandardDerivatives: `
     #extension GL_OES_standard_derivatives : enable
   `,
-    constants: `
+  constants: `
     #define PI 3.141592653589793238
     #define HALF_PI 1.57079632679
     #define HALF_PI_INV 0.15915494309
@@ -14,17 +14,17 @@ const glsl = Object.freeze({
     #define C_I (vec2(0.0, 1.0))
     #define TO_RADIANS 0.01745329251
   `,
-    precision: `
+  precision: `
     precision mediump float;
   `,
-    hsv2rgb: `
+  hsv2rgb: `
     vec3 hsv2rgb(vec3 c) {
       vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
       vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
       return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
     }
   `,
-    complex: `
+  complex: `
     float cosh (float x) {
       return 0.5 * (exp(x) + exp(-x));
     }
@@ -151,7 +151,7 @@ const glsl = Object.freeze({
       return cdiv(ez - emz, ez + emz);
     }
   `,
-    hypot: `
+  hypot: `
     float hypot (vec2 z) {
       float t;
       float x = abs(z.x);
@@ -162,7 +162,7 @@ const glsl = Object.freeze({
       return x * sqrt(1.0 + t * t);
     }
   `,
-    wireframe: `
+  wireframe: `
     // https://github.com/rreusser/glsl-solid-wireframe
     float wireframe (float parameter, float width, float feather) {
       float w1 = width - feather * 0.5;
@@ -252,16 +252,30 @@ varying vec2 v_position;
 uniform float u_gridSize;
 uniform float u_lineWidth;
 uniform float u_lineFeather;
+uniform bool u_polar;
 
 void main() {
     float x = v_position.x;
     float y = v_position.y;
+    vec3 rgb;
+    float gridFactor;
 
-    // atan(y, x) -> (-PI, PI)
-    vec3 rgb = 1.2 * hsv2rgb(vec3(atan(y, x) * HALF_PI_INV, 1.0, 0.5));
-    float gridFactor = 1.0 - wireframe(v_position*u_gridSize, u_lineWidth, u_lineFeather);
-    gridFactor = pow(gridFactor, 0.5);
-    gl_FragColor = mix(vec4(rgb, 1.0), vec4(vec3(1.0), gridFactor), gridFactor);
+    if (u_polar) {
+      // atan(y, x) -> (-PI, PI)
+      // Add 1e-6 to avoid division by zero at the origin
+      float hue = atan(y+1e-10, x) * HALF_PI_INV; // Normalize to (-0.5, 0.5)
+      float radius = length(v_position);
+      // rgb = 1.2 * hsv2rgb(vec3(hue, 1.0, 0.5));
+      rgb = mix(vec3(hue+0.5, 0.0, 0.0), vec3(0.0, radius*0.1, 0.3), 0.5);
+      gridFactor = 1.0 - wireframe(vec2(hue+0.5, radius)*u_gridSize, u_lineWidth, u_lineFeather);
+      gl_FragColor = mix(vec4(rgb, 1.0), vec4(vec3(1.0), gridFactor), gridFactor*0.5);
+    } else {
+      // rgb = vec3(vec2(x, y)*0.5+0.5, 0.0);
+      rgb = vec3(x*0.5+0.5, y*0.5+0.5, 0.5);
+      gridFactor = 1.0 - wireframe(v_position*u_gridSize, u_lineWidth, u_lineFeather);
+      gl_FragColor = mix(vec4(rgb, 1.0), vec4(vec3(1.0), gridFactor), gridFactor*0.5);
+    }
+
     return;
 }
 `
@@ -274,7 +288,7 @@ const gl = canvas.getContext('webgl');
 const ext = gl.getExtension('OES_standard_derivatives');
 
 if (!ext) {
-    console.warn('OES_standard_derivatives not supported - falling back to basic rendering');
+  console.warn('OES_standard_derivatives not supported - falling back to basic rendering');
 }
 
 // Make canvas full width and ratio as 16:9
@@ -282,68 +296,68 @@ const ratio = 16 / 9;
 
 // 初始化画布大小
 function resizeCanvas() {
-    // 获取父容器宽度（考虑padding和border）
-    const w = main.clientWidth;
+  // 获取父容器宽度（考虑padding和border）
+  const w = main.clientWidth;
 
-    // 设置canvas尺寸
-    canvas.width = w;
-    canvas.height = w / ratio;
+  // 设置canvas尺寸
+  canvas.width = w;
+  canvas.height = w / ratio;
 
-    // 如果WebGL已初始化，更新视口
-    if (gl) {
-        gl.viewport(0, 0, canvas.width, canvas.height);
-    }
+  // 如果WebGL已初始化，更新视口
+  if (gl) {
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
 
-    console.log(`Canvas 调整大小: ${canvas.width}x${canvas.height}`);
+  console.log(`Canvas 调整大小: ${canvas.width}x${canvas.height}`);
 }
 resizeCanvas()
 
 // 监听窗口大小变化
 window.addEventListener('resize', () => {
-    resizeCanvas();
+  resizeCanvas();
 });
 
 // Helper function to create and compile shader
 function createShader(gl, source, type) {
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
 
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error('Shader compile error:', gl.getShaderInfoLog(shader));
-        gl.deleteShader(shader);
-        return null;
-    }
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+  }
 
-    return shader;
+  return shader;
 }
 
 // Helper function to create program
 function createProgram(gl, vertSource, fragSource) {
-    const vertShader = createShader(gl, vertSource, gl.VERTEX_SHADER);
-    const fragShader = createShader(gl, fragSource, gl.FRAGMENT_SHADER);
+  const vertShader = createShader(gl, vertSource, gl.VERTEX_SHADER);
+  const fragShader = createShader(gl, fragSource, gl.FRAGMENT_SHADER);
 
-    const program = gl.createProgram();
-    gl.attachShader(program, vertShader);
-    gl.attachShader(program, fragShader);
-    gl.linkProgram(program);
+  const program = gl.createProgram();
+  gl.attachShader(program, vertShader);
+  gl.attachShader(program, fragShader);
+  gl.linkProgram(program);
 
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        console.error('Program link error:', gl.getProgramInfoLog(program));
-        return null;
-    }
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.error('Program link error:', gl.getProgramInfoLog(program));
+    return null;
+  }
 
-    return program;
+  return program;
 }
 
 const program = createProgram(gl, vert, frag);
 
 // Define vertices for a quad that covers the entire clip space
 const vertices = new Float32Array([
-    -1.0, -1.0,  // bottom left
-    1.0, -1.0,  // bottom right
-    -1.0, 1.0,  // top left
-    1.0, 1.0   // top right
+  -1.0, -1.0,  // bottom left
+  1.0, -1.0,  // bottom right
+  -1.0, 1.0,  // top left
+  1.0, 1.0   // top right
 ]);
 
 // Create buffer and upload vertex data
@@ -362,43 +376,45 @@ gl.useProgram(program);
 gl.uniform1f(ratioLoc, ratio);
 
 const gui = new dat.GUI({
-    title: 'Grid Controls',
-    width: 300,
+  title: 'Grid Controls',
+  width: 300,
 });
-container.style.display = 'inline-block';
-container.appendChild(gui.domElement);
 
 const u_gridSize = gl.getUniformLocation(program, 'u_gridSize'),
-    u_lineWidth = gl.getUniformLocation(program, 'u_lineWidth'),
-    u_lineFeather = gl.getUniformLocation(program, 'u_lineFeather');
+  u_lineWidth = gl.getUniformLocation(program, 'u_lineWidth'),
+  u_lineFeather = gl.getUniformLocation(program, 'u_lineFeather'),
+  u_polar = gl.getUniformLocation(program, 'u_polar');
 
 const params = {
-    gridSize: 5.0,
-    lineWidth: 0.5,
-    lineFeather: 1.0,
+  gridSize: 5.0,
+  lineWidth: 0.5,
+  lineFeather: 1.0,
+  polar: true,
 };
 
 gui.add(params, 'gridSize', 1.0, 10.0).name('Grid Size').onChange(updateUniforms);
 gui.add(params, 'lineWidth', 0.1, 2.0).name('Line Width').onChange(updateUniforms);
 gui.add(params, 'lineFeather', 0.1, 20.0).name('Line Feather').onChange(updateUniforms);
+gui.add(params, 'polar').name('Polar Grid').onChange(updateUniforms);
 
 // Function to update uniforms from params
 function updateUniforms() {
-    gl.uniform1f(u_gridSize, params.gridSize);
-    gl.uniform1f(u_lineWidth, params.lineWidth);
-    gl.uniform1f(u_lineFeather, params.lineFeather);
+  gl.uniform1f(u_gridSize, params.gridSize);
+  gl.uniform1f(u_lineWidth, params.lineWidth);
+  gl.uniform1f(u_lineFeather, params.lineFeather);
+  gl.uniform1i(u_polar, params.polar ? 1 : 0);
 }
 
 updateUniforms();
 
 function render() {
-    // Use program and draw
-    // gl.useProgram(program);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  // Use program and draw
+  // gl.useProgram(program);
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-    requestAnimationFrame(render);
+  requestAnimationFrame(render);
 }
 
 render();
