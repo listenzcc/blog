@@ -5,14 +5,20 @@ author: "Listenzcc"
 tags: Simulation
 toc: true
 ---
-How the ants work together.
+How do the ants work together?
 
 ---
 
 * This line will be replaced with the TOC
 {:toc}
 
-代码已经实现了一个比较完整的 **双信息素蚁群系统**。整体结构可以理解为一个离散空间上的 **stochastic agent system**，其行为机制接近经典的 **Ant Colony Foraging Model**。
+本文通过程序模拟解释 How do the ants work together? 这个问题。
+
+这个好奇是源自于媳妇的一句话，她在试用LLM后，觉得这个东西的原理不可能是“预测后一个字符”，因为这太简单和短视了，无法产生实际上已经出现的有价值的对话。这让我想到了小小的蚂蚁，每只蚂蚁的视野都很小，但群体却极其高效和有序。
+
+本文的代码实现了 **双信息素蚁群系统**。整体结构可以理解为一个离散空间上的 **stochastic agent system**，其行为机制接近经典的 **Ant Colony Foraging Model**。体现了小小的蚂蚁如何通过每个短视的行为构筑起群体的高效与智能。
+
+您可以在我的在线笔记本 <[Ant simulation / Chuncheng | Observable](https://observablehq.com/@listenzcc/ant-simulation)> 和博客 <https://listenzcc.github.io/blog/2026-03-06/ant-simulation> 找到实时在线版本和源码。
 
 ---
 
@@ -47,8 +53,7 @@ $$
 \tau_{ij}
 $$
 
-表示从节点 $i$ 到节点 $j$ 的吸引程度。
-蚂蚁从节点 $i$ 选择下一个节点 $j$ 的概率为
+表示从节点 $i$ 到节点 $j$ 的吸引程度。蚂蚁从节点 $i$ 选择下一个节点 $j$ 的概率为（当然，这只是理论式，实时并不会这么复杂）
 
 $$
 P_{ij} =
@@ -101,7 +106,7 @@ $$
 
 ---
 
-### 最短路径为何会自动出现
+### 更短路径为何会自动出现
 
 设两条路径长度分别为
 
@@ -147,29 +152,22 @@ $$
 * 信息素跟随
 * 信息素沉积
 
-却能产生：
+却能产生种种智能行为：
 
 * 最短路径发现
 * 动态环境适应
 * 群体协作
 
-这种现象被称为：
-**Emergent Intelligence（涌现智能）**
-
-类似机制也出现在：
+这种现象被称为 **Emergent Intelligence（涌现智能）** 类似机制也出现在以下领域
 
 * 鸟群模型（Boids）
 * 鱼群行为
 * 细菌趋化
 * 神经网络学习
 
-类似这样，
-**局部规则 + 环境记忆 → 群体智能。**
-蚂蚁并不知道最短路径在哪里，但通过不断强化有效路径，整个系统最终会“计算”出最优解。
+类似这样， **局部规则 + 环境记忆 → 群体智能。** 每只蚂蚁并不知道最短路径在哪里，但通过不断强化有效路径，整个系统最终会“计算”出最优解。
 
-换句话说：
-**优化并不一定需要中央控制。**
-自然界通过极其简单的规则，就能完成复杂问题的求解。
+换句话说， **优化并不一定需要中央控制。** 自然界通过极其简单的短视规则，就能完成复杂问题的求解。这与 LLM 是相近的，大量“预测下一个字”的小机制复合成具有智能的大系统。所以 LLM 表现出的智能是涌现出来的。
 
 ---
 
@@ -254,7 +252,7 @@ $$
 
     这保证旧路径会逐渐消失，系统能够适应新的食物源。
 
-## 永远能回家的策略
+### 永远能回家的策略
 
 系统中每只蚂蚁具有两种状态：
 
@@ -263,9 +261,9 @@ $$
 
 觅食蚂蚁在移动时不断释放 **home pheromone**，并且强度随时间而减小
 
-```javascript
-homePheromone[idx] = deposit
-```
+    ```javascript
+    homePheromone[idx] = deposit
+    ```
 
 当蚂蚁获得食物后，其行为策略发生反转：
 
@@ -281,21 +279,21 @@ $$
 因此只要路径曾被探索过，回家的梯度就始终存在。
 这就是蚂蚁“永远能回家”的机制。
 
-## 引导到食物的策略
+### 引导到食物的策略
 
 我们的虚拟蚂蚁按照以下规则引导同伴找到食物
 
-```javascript
-// 当蚂蚁成功找到食物并开始返回巢穴时，它会留下 **food pheromone**：
-// 这个值随着蚂蚁距离食物的距离增加而减小
-foodPheromone[idx] = deposit
+    ```javascript
+    // 当蚂蚁成功找到食物并开始返回巢穴时，它会留下 **food pheromone**：
+    // 这个值随着蚂蚁距离食物的距离增加而减小
+    foodPheromone[idx] = deposit
 
-// 同时记录 **信息素寿命**
-foodPheromoneAge[idx] = limit
+    // 同时记录 **信息素寿命**
+    foodPheromoneAge[idx] = limit
 
-// 当寿命结束后信息素快速衰减：
-foodPheromone[i] -= fps
-```
+    // 当寿命结束后信息素快速衰减：
+    foodPheromone[i] -= fps
+    ```
 
 这种设计产生两个效果：
 
@@ -321,7 +319,7 @@ $$
 于是短路径的信息素浓度更高，蚂蚁更容易跟随它。
 这就是经典 **positive feedback + evaporation** 机制。
 
-## 群体模拟
+### 群体模拟
 
 整个系统是一个 **agent-based simulation**。
 系统状态可以写为：
@@ -338,23 +336,23 @@ $$
 
 每一帧执行以下步骤：
 
-```javascript
-// 1. 信息素挥发
-updatePheromones()
+    ```javascript
+    // 1. 信息素挥发
+    updatePheromones()
 
-// 2. 蚂蚁决策
-applyAntDecision()
+    // 2. 蚂蚁决策
+    applyAntDecision()
 
-// 3. 移动
-ant.x += vx
-ant.y += vy
+    // 3. 移动
+    ant.x += vx
+    ant.y += vy
 
-// 4. 沉积信息素
-depositPheromone()
+    // 4. 沉积信息素
+    depositPheromone()
 
-// 5. 环境交互
-handleInteractions()
-```
+    // 5. 环境交互
+    handleInteractions()
+    ```
 
 系统行为具有几个典型 emergent phenomena:
 
@@ -367,8 +365,8 @@ handleInteractions()
 3. 动态适应
     当食物消失时，路径随时间而消失
 
-    ```txt
-    pheromone → evaporation → path vanish
-    ```
+        ```txt
+        pheromone → evaporation → path vanish
+        ```
 
     群体重新探索。

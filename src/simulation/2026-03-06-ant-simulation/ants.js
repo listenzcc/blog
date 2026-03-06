@@ -284,6 +284,7 @@ function handleCollisions() {
     const n = ants.length;
     for (let i = 0; i < n; i++) {
         const a1 = ants[i];
+        if (a1.state === STATE_CARRYING) continue;
         for (let j = i + 1; j < n; j++) {
             const a2 = ants[j];
             // if (a1.state === STATE_CARRYING || a2.state === STATE_CARRYING) continue
