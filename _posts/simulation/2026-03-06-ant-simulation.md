@@ -5,20 +5,18 @@ author: "Listenzcc"
 tags: Simulation
 toc: true
 ---
-How do the ants work together?
-
----
-
-* This line will be replaced with the TOC
-{:toc}
-
 本文通过程序模拟解释 How do the ants work together? 这个问题。
 
 这个好奇是源自于媳妇的一句话，她在试用LLM后，觉得这个东西的原理不可能是“预测后一个字符”，因为这太简单和短视了，无法产生实际上已经出现的有价值的对话。这让我想到了小小的蚂蚁，每只蚂蚁的视野都很小，但群体却极其高效和有序。
 
 本文的代码实现了 **双信息素蚁群系统**。整体结构可以理解为一个离散空间上的 **stochastic agent system**，其行为机制接近经典的 **Ant Colony Foraging Model**。体现了小小的蚂蚁如何通过每个短视的行为构筑起群体的高效与智能。
 
-您可以在我的在线笔记本 <[Ant simulation / Chuncheng | Observable](https://observablehq.com/@listenzcc/ant-simulation)> 和博客 <https://listenzcc.github.io/blog/2026-03-06/ant-simulation> 找到实时在线版本和源码。
+您可以在我的在线笔记本 <[Ant simulation / Chuncheng | Observable](https://observablehq.com/@listenzcc/ant-simulation)> 和博客 <[gp-ant-simulation](https://listenzcc.github.io/blog/2026-03-06/ant-simulation "gp-ant-simulation")> 找到实时在线版本和源码。
+
+---
+
+* This line will be replaced with the TOC
+{:toc}
 
 ---
 
@@ -146,26 +144,26 @@ $$
 
 **个体极其简单，但群体行为高度复杂。**
 
-单个蚂蚁只具备：
+单个蚂蚁只具备一些极度短视的能力，包括：
 
 * 随机探索
 * 信息素跟随
 * 信息素沉积
 
-却能产生种种智能行为：
+整个种群却能产生种种智能体才能具备的行为，比如：
 
 * 最短路径发现
 * 动态环境适应
 * 群体协作
 
-这种现象被称为 **Emergent Intelligence（涌现智能）** 类似机制也出现在以下领域
+这种现象被称为 **Emergent Intelligence（涌现智能）**， 类似机制也出现在以下领域
 
 * 鸟群模型（Boids）
 * 鱼群行为
 * 细菌趋化
 * 神经网络学习
 
-类似这样， **局部规则 + 环境记忆 → 群体智能。** 每只蚂蚁并不知道最短路径在哪里，但通过不断强化有效路径，整个系统最终会“计算”出最优解。
+类似这样， **局部规则 + 环境记忆 → 群体智能。** 每只蚂蚁并不知道最短路径在哪里，但通过不断强化有效路径，整个系统像一台计算机一样，会通过不断试错“计算”出最优解。
 
 换句话说， **优化并不一定需要中央控制。** 自然界通过极其简单的短视规则，就能完成复杂问题的求解。这与 LLM 是相近的，大量“预测下一个字”的小机制复合成具有智能的大系统。所以 LLM 表现出的智能是涌现出来的。
 
