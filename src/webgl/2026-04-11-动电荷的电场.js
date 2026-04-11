@@ -3,8 +3,8 @@
 
 const canvas = document.getElementById('canvas') || document.createElement('canvas');
 const h2 = document.getElementById('canvasH2') || document.createElement('h2');
-document.body.appendChild(h2).textContent = 'Click to toggle sign';
-document.body.appendChild(canvas);
+// document.body.appendChild(h2).textContent = 'Click to toggle sign';
+// document.body.appendChild(canvas);
 const size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
 canvas.width = size;
 canvas.height = size;
